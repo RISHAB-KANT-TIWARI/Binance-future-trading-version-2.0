@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TradeMind AI Copilot &mdash; Hackathon Dashboard</title>
+  <meta name="description"
+    content="AI-powered Binance Trading Copilot with explainable AI, sentiment analysis, risk intelligence and live market signals." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --bg2: #0a0f1e;
+      --panel: rgba(10, 15, 40, 0.72);
+      --panel-border: rgba(99, 179, 237, 0.14);
+      --text: #e8f4fd;
+      --muted: #7a9bbf;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #34d399;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --good: #34d399;
+      --glow-blue: rgba(56, 189, 248, 0.22);
+      --glow-purple: rgba(129, 140, 248, 0.18);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(56, 189, 248, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 5%, rgba(129, 140, 248, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 60% at 50% 100%, rgba(52, 211, 153, 0.06) 0%, transparent 60%);
+    }
+
+    /* ── Grid ── */
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      margin-bottom: 28px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px var(--glow-blue);
+      animation: pulse-logo 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-logo {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px var(--glow-blue);
+      }
+
+      50% {
+        box-shadow: 0 0 36px rgba(56, 189, 248, 0.5);
+      }
+    }
+
+    .logo-text h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text h1 span {
+      color: var(--accent);
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: 0.06em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--good);
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--good);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    .ts {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Cards / Panels ── */
+    .card,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .card {
+      padding: 22px 24px;
+    }
+
+    .panel {
+      padding: 22px 24px;
+    }
+
+    .card:hover,
+    .panel:hover {
+      border-color: rgba(99, 179, 237, 0.28);
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.06);
+      transition: border-color .3s, box-shadow .3s;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title .icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+    }
+
+    /* ── Hero Metrics Row ── */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2.4fr repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .price-card {
+      grid-column: 1;
+    }
+
+    .price-card .eyebrow {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .price-card .price {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .price-card .symbol {
+      color: var(--accent);
+    }
+
+    .price-card .change {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .change.up {
+      color: var(--good);
+    }
+
+    .change.down {
+      color: var(--danger);
+    }
+
+    .change.flat {
+      color: var(--muted);
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-card .m-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .metric-card .m-val {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .metric-card .m-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .clr-green {
+      color: var(--good);
+    }
+
+    .clr-yellow {
+      color: var(--warn);
+    }
+
+    .clr-red {
+      color: var(--danger);
+    }
+
+    .clr-blue {
+      color: var(--accent);
+    }
+
+    .clr-purple {
+      color: var(--accent2);
+    }
+
+    .clr-white {
+      color: var(--text);
+    }
+
+    /* ── Recommendation Banner ── */
+    .rec-banner {
+      padding: 16px 24px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      border: 1px solid;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fade-in 0.6s ease;
+    }
+
+    .rec-banner.buy {
+      background: rgba(52, 211, 153, 0.08);
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    .rec-banner.sell {
+      background: rgba(248, 113, 113, 0.08);
+      border-color: rgba(248, 113, 113, 0.35);
+    }
+
+    .rec-banner.hold {
+      background: rgba(251, 191, 36, 0.07);
+      border-color: rgba(251, 191, 36, 0.30);
+    }
+
+    .rec-banner .rec-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .rec-banner .rec-val {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .rec-banner .rec-conf {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .rec-banner .rec-conf b {
+      font-size: 22px;
+      display: block;
+      font-weight: 800;
+    }
+
+    /* ── Main Grid ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Charts ── */
+    .chart-wrap {
+      position: relative;
+      height: 240px;
+    }
+
+    .chart-wrap canvas {
+      border-radius: 12px;
+    }
+
+    /* ── Sentiment Bar ── */
+    .sent-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sent-row .sent-lbl {
+      width: 64px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sent-row .sent-pct {
+      width: 38px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: right;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.12);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1.2s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .bar-fill.bull {
+      background: linear-gradient(90deg, var(--good), #6ee7b7);
+    }
+
+    .bar-fill.neu {
+      background: linear-gradient(90deg, var(--warn), #fde68a);
+    }
+
+    .bar-fill.bear {
+      background: linear-gradient(90deg, var(--danger), #fca5a5);
+    }
+
+    /* ── Risk Gauge ── */
+    .gauge-wrap {
+      position: relative;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-wrap canvas {
+      max-height: 160px;
+    }
+
+    .gauge-center {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .gauge-center .g-val {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .gauge-center .g-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Explanation List ── */
+    .exp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .exp-item {
+      padding: 12px 14px;
+      border-radius: 13px;
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.12);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .exp-item .exp-icon {
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Trade History Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.07);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge.buy {
+      background: rgba(52, 211, 153, 0.15);
+      color: #6ee7b7;
+    }
+
+    .badge.sell {
+      background: rgba(248, 113, 113, 0.15);
+      color: #fca5a5;
+    }
+
+    /* ── Chips / Tags ── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      color: var(--muted);
+    }
+
+    .chip.good {
+      background: rgba(52, 211, 153, 0.1);
+      border-color: rgba(52, 211, 153, 0.25);
+      color: #6ee7b7;
+    }
+
+    .chip.warn {
+      background: rgba(251, 191, 36, 0.1);
+      border-color: rgba(251, 191, 36, 0.25);
+      color: #fde68a;
+    }
+
+    .chip.bad {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: rgba(248, 113, 113, 0.25);
+      color: #fca5a5;
+    }
+
+    .chip.info {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: rgba(56, 189, 248, 0.25);
+      color: #7dd3fc;
+    }
+
+    /* ── Technical Signals Grid ── */
+    .sig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .sig-item {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(148, 163, 184, 0.05);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .sig-item .si-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .sig-item .si-val {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sig-item .si-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Bottom Grid ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .card,
+    .panel {
+      animation: fade-in .5s ease both;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .price-card {
+        grid-column: 1 / -1;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .sig-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        padding: 12px 14px 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- ── Header ── -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-dot">&#9670;</div>
+        <div class="logo-text">
+          <h1>TradeMind <span>AI</span></h1>
+          <p>Explainable Trading Copilot &bull; Hackathon Edition</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <div class="live-dot"></div> LIVE DATA
+        </div>
+        <div class="ts">Generated: 2026-06-13 11:23 UTC</div>
+      </div>
+    </div>
+
+    <!-- ── Hero Metrics ── -->
+    <div class="hero-grid">
+      <div class="card price-card">
+        <div class="eyebrow">Current Price &bull; BTCUSDT</div>
+        <div class="price"><span class="symbol">BTCUSDT</span> &nbsp;$63,924.6000</div>
+        <div class="change up">+0.24% &nbsp;(24h)</div>
+        <div class="chips">
+          <span class="chip ">Strategy: Range Trading</span>
+          <span class="chip ">Regime: Sideways</span>
+          <span class="chip info">Stop-loss 0.80%</span>
+          <span class="chip info">Take-profit 1.20%</span>
+          <span class="chip">Position 1250.00 USDT</span>
+        </div>
+      </div>
+      <div class="card metric-card">
+        <div class="m-label">Confidence Score</div>
+        <div class="m-val clr-blue">97%</div>
+        <div class="m-sub">Short-term: UP</div>
+      </div>
+      <div class="card metric-card">
+        <div class="m-label">AI Sentiment</div>
+        <div class="m-val clr-yellow">Neutral</div>
+        <div class="m-sub">Confidence 72%</div>
+      </div>
+      <div class="card metric-card">
+        <div class="m-label">Risk Score</div>
+        <div class="m-val clr-green">7<span style="font-size:14px;font-weight:400;color:var(--muted)">/100</span></div>
+        <div class="m-sub">Daily guard: ACTIVE</div>
+      </div>
+    </div>
+
+    <!-- ── Recommendation Banner ── -->
+    <div class="rec-banner buy">
+      <div>
+        <div class="rec-label">AI Recommendation</div>
+        <div class="rec-val clr-green">BUY</div>
+      </div>
+      <div style="flex:1; padding: 0 32px;">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Why this recommendation?</div>
+        <div style="font-size:13px;line-height:1.6;">MACD is above signal, showing bullish momentum.; Volume increased
+          by 30.8%, confirming stronger participation.; Strategy selected: range trading for the current sideways
+          market.</div>
+      </div>
+      <div class="rec-conf">
+        <div>Prediction Confidence</div>
+        <b class="clr-blue">97%</b>
+      </div>
+    </div>
+
+    <!-- ── Main Grid ── -->
+    <div class="main-grid">
+      <div class="left-col">
+
+        <!-- Price Chart -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(56,189,248,0.12);">&#128200;</div>
+            Price Trend &mdash; BTCUSDT
+          </div>
+          <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+        </div>
+
+        <!-- Technical Signals -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(129,140,248,0.12);">&#9889;</div>
+            Technical Signals
+          </div>
+          <div class="sig-grid">
+            <div class="sig-item">
+              <div class="si-label">RSI (14)</div>
+              <div class="si-val clr-white">67.2</div>
+              <div class="si-sub">Neutral</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">MACD Histogram</div>
+              <div class="si-val clr-green">+9.6091</div>
+              <div class="si-sub">Bullish momentum</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">Volume Change</div>
+              <div class="si-val clr-green">+30.8%</div>
+              <div class="si-sub">vs prior 3 candles</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">Trend Strength</div>
+              <div class="si-val clr-green">+0.16%</div>
+              <div class="si-sub">15-candle momentum</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">ATR (14)</div>
+              <div class="si-val clr-white">0.10%</div>
+              <div class="si-sub">Volatility measure</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">Volatility</div>
+              <div class="si-val clr-white">0.11%</div>
+              <div class="si-sub">20-candle std dev</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(52,211,153,0.12);">&#128203;</div>
+            Trade History
+          </div>
+          <div style="color:var(--muted);font-size:13px;padding:12px 0;">No trade history recorded yet.</div>
+        </div>
+
+      </div>
+      <div class="right-col">
+
+        <!-- Risk Gauge -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(248,113,113,0.12);">&#128737;</div>
+            Risk Intelligence
+          </div>
+          <div class="gauge-wrap">
+            <canvas id="riskGauge"></canvas>
+            <div class="gauge-center">
+              <div class="g-val clr-green">7</div>
+              <div class="g-lbl">Risk Score</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+            <div class="sig-item">
+              <div class="si-label">Risk Level</div>
+              <div class="si-val clr-green">Low</div>
+            </div>
+            <div class="sig-item">
+              <div class="si-label">Position</div>
+              <div class="si-val clr-white" style="font-size:14px;">0.019554 BTC</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentiment Breakdown -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(251,191,36,0.12);">&#127757;</div>
+            AI Sentiment Breakdown
+          </div>
+          <div class="sent-row">
+            <div class="sent-lbl clr-green">Bullish</div>
+            <div class="sent-pct">33%</div>
+            <div class="bar-track">
+              <div class="bar-fill bull" style="width:33%"></div>
+            </div>
+          </div>
+          <div class="sent-row">
+            <div class="sent-lbl clr-yellow">Neutral</div>
+            <div class="sent-pct">46%</div>
+            <div class="bar-track">
+              <div class="bar-fill neu" style="width:46%"></div>
+            </div>
+          </div>
+          <div class="sent-row">
+            <div class="sent-lbl clr-red">Bearish</div>
+            <div class="sent-pct">21%</div>
+            <div class="bar-track">
+              <div class="bar-fill bear" style="width:21%"></div>
+            </div>
+          </div>
+          <div
+            style="margin-top:14px;padding:12px;border-radius:12px;background:rgba(148,163,184,0.06);font-size:12px;color:var(--muted);line-height:1.6;">
+            Analyzed 2 sentiment inputs &bull; 24h price change +0.24% &bull; Volume change +30.79% &bull; BTCUSDT
+            momentum driven market context with recent price action and volume flow.
+          </div>
+        </div>
+
+        <!-- Prediction Mix -->
+        <div class="panel">
+          <div class="panel-title">
+            <div class="icon" style="background:rgba(56,189,248,0.12);">&#127919;</div>
+            AI Prediction Mix
+          </div>
+          <div class="chart-wrap" style="height:180px;">
+            <canvas id="predictionChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Bottom Grid ── -->
+    <div class="bottom-grid">
+      <!-- Trade Explanation -->
+      <div class="panel">
+        <div class="panel-title">
+          <div class="icon" style="background:rgba(52,211,153,0.12);">&#129504;</div>
+          Explainable AI &mdash; Trade Reasoning
+        </div>
+        <div class="exp-list">
+          <div class="exp-item"><span class="exp-icon">&#9654;</span>MACD is above signal, showing bullish momentum.
+          </div>
+          <div class="exp-item"><span class="exp-icon">&#9654;</span>Volume increased by 30.8%, confirming stronger
+            participation.</div>
+          <div class="exp-item"><span class="exp-icon">&#9654;</span>Strategy selected: range trading for the current
+            sideways market.</div>
+          <div class="exp-item"><span class="exp-icon">&#9654;</span>Dynamic stop-loss 0.80% and take-profit 1.20% are
+            aligned to volatility.</div>
+        </div>
+      </div>
+
+      <!-- Probability Bars -->
+      <div class="panel">
+        <div class="panel-title">
+          <div class="icon" style="background:rgba(129,140,248,0.12);">&#128202;</div>
+          Direction Probabilities
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;margin-top:4px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+              <span class="clr-green" style="font-weight:600;">UP</span>
+              <span class="clr-green" style="font-family:'JetBrains Mono',monospace;font-weight:700;">90%</span>
+            </div>
+            <div class="bar-track" style="height:13px;border-radius:8px;">
+              <div class="bar-fill bull" style="width:90%;height:100%;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+              <span class="clr-yellow" style="font-weight:600;">SIDEWAYS</span>
+              <span class="clr-yellow" style="font-family:'JetBrains Mono',monospace;font-weight:700;">5%</span>
+            </div>
+            <div class="bar-track" style="height:13px;border-radius:8px;">
+              <div class="bar-fill neu" style="width:5%;height:100%;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+              <span class="clr-red" style="font-weight:600;">DOWN</span>
+              <span class="clr-red" style="font-family:'JetBrains Mono',monospace;font-weight:700;">5%</span>
+            </div>
+            <div class="bar-track" style="height:13px;border-radius:8px;">
+              <div class="bar-fill bear" style="width:5%;height:100%;"></div>
+            </div>
+          </div>
+          <div
+            style="margin-top:8px;padding:16px;border-radius:14px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.12);">
+            <div
+              style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">
+              Summary</div>
+            <div style="font-size:13px;line-height:1.6;">BTCUSDT is neutral with up bias. Market regime: sideways.
+              Strategy: range trading.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script>
+    const priceData = { "labels": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60"], "values": [63495.7, 63416.3, 63575.6, 63485.6, 63510.3, 63482.9, 63504.8, 63574.4, 63497.6, 63501.7, 63430.3, 63443.5, 63480.1, 63548.4, 63523.9, 63500.2, 63559.8, 63603.1, 63600.0, 63622.2, 63763.1, 63776.6, 63769.8, 63689.6, 63595.4, 63612.0, 63630.5, 63480.0, 63471.5, 63518.9, 63481.8, 63511.6, 63578.5, 63476.1, 63504.9, 63550.1, 63548.2, 63524.2, 63550.0, 63616.4, 63616.8, 63708.3, 63724.3, 63765.4, 63795.0, 63823.1, 63777.3, 63790.0, 63847.9, 63807.2, 63788.3, 63784.3, 63799.8, 63720.2, 63723.6, 63708.6, 63836.4, 63880.3, 63894.0, 63925.3] };
+    const predData = { "up": 90, "down": 5, "sideways": 5 };
+    const riskScore = 7;
+
+    /* ── Price Line Chart ── */
+    new Chart(document.getElementById('priceChart'), {
+      type: 'line',
+      data: {
+        labels: priceData.labels,
+        datasets: [{
+          label: 'BTCUSDT Price',
+          data: priceData.values,
+          borderColor: '#38bdf8',
+          backgroundColor: (ctx) => {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 220);
+            g.addColorStop(0, 'rgba(56,189,248,0.22)');
+            g.addColorStop(1, 'rgba(56,189,248,0.01)');
+            return g;
+          },
+          tension: 0.38, fill: true, pointRadius: 0,
+          borderWidth: 2.5,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 1000 },
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#5a7a9f', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.06)' } },
+          y: { ticks: { color: '#5a7a9f', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,0.06)' } }
+        }
+      }
+    });
+
+    /* ── Prediction Doughnut ── */
+    new Chart(document.getElementById('predictionChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Up', 'Sideways', 'Down'],
+        datasets: [{
+          data: [predData.up, predData.sideways, predData.down],
+          backgroundColor: ['rgba(52,211,153,0.85)', 'rgba(251,191,36,0.75)', 'rgba(248,113,113,0.85)'],
+          borderWidth: 0, hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '68%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#7a9bbf', padding: 14, font: { size: 12 } } } }
+      }
+    });
+
+    /* ── Risk Gauge (custom arc) ── */
+    const riskCanvas = document.getElementById('riskGauge');
+    const riskCtx = riskCanvas.getContext('2d');
+    riskCanvas.width = 220;
+    riskCanvas.height = 140;
+
+    function drawGauge(score) {
+      riskCtx.clearRect(0, 0, 220, 140);
+      const cx = 110, cy = 130, r = 88, lw = 18;
+      const startA = Math.PI, endA = 2 * Math.PI;
+      const norm = Math.max(0, Math.min(1, score / 100));
+
+      // Track
+      riskCtx.beginPath();
+      riskCtx.arc(cx, cy, r, startA, endA);
+      riskCtx.strokeStyle = 'rgba(148,163,184,0.1)';
+      riskCtx.lineWidth = lw; riskCtx.lineCap = 'round';
+      riskCtx.stroke();
+
+      // Fill gradient
+      const fillEnd = startA + norm * Math.PI;
+      const grd = riskCtx.createLinearGradient(cx - r, cy, cx + r, cy);
+      grd.addColorStop(0, '#34d399');
+      grd.addColorStop(0.45, '#fbbf24');
+      grd.addColorStop(1, '#f87171');
+      riskCtx.beginPath();
+      riskCtx.arc(cx, cy, r, startA, fillEnd);
+      riskCtx.strokeStyle = grd;
+      riskCtx.lineWidth = lw; riskCtx.lineCap = 'round';
+      riskCtx.stroke();
+    }
+    // Animate gauge fill
+    let current = 0;
+    const step = () => { if (current < riskScore) { current += 2; drawGauge(current); requestAnimationFrame(step); } else drawGauge(riskScore); };
+    step();
+  </script>
+</body>
+
+</html>
